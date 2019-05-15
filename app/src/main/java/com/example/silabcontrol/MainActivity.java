@@ -1,7 +1,9 @@
 package com.example.silabcontrol;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -10,12 +12,14 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.io.DataInputStream;
@@ -31,9 +35,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     Button buttonThrottle;
     Button buttonBrake;
 
-    double inputGas;
-    double inputBrake;
-    double steering;
+    double inputGas = 0;
+    double inputBrake = 0;
+    double steering = 0;
 
     ImageView pointerSpeed;
     ImageView pointerRevs;
@@ -44,9 +48,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     DataOutputStream dos;
     OutputStream os;
 
-    String server;
-    int port;
-
+    String server = "192.168.2.105";
+    int port = 25143;
 
 
 
@@ -126,11 +129,66 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
 
 
-        Client client = new Client();
-        client.execute();
+
+
+    }
+
+
+
+    public void settings(View view){
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.settings_dialog, null);
+        dialogBuilder.setView(dialogView);
+
+        final EditText ipEdittext = (EditText) dialogView.findViewById(R.id.ip);
+        final EditText portEdittext = (EditText) dialogView.findViewById(R.id.port);
+
+        dialogBuilder.setTitle("TCP/IP Konfiguration");
+
+        dialogBuilder.setPositiveButton("Connect", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                server = ipEdittext.getText().toString();
+                port = Integer.parseInt(portEdittext.getText().toString());
+
+                Client client = new Client();
+                client.execute();
+
+                View decorView = getWindow().getDecorView();
+                // Hide both the navigation bar and the status bar.
+                // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+                // a general rule, you should design your app to hide the status bar whenever you
+                // hide the navigation bar.
+                int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+                decorView.setSystemUiVisibility(uiOptions);
+
+            }
+        });
+        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //pass
+
+                View decorView = getWindow().getDecorView();
+                // Hide both the navigation bar and the status bar.
+                // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+                // a general rule, you should design your app to hide the status bar whenever you
+                // hide the navigation bar.
+                int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+                decorView.setSystemUiVisibility(uiOptions);
+
+            }
+        });
+        AlertDialog b = dialogBuilder.create();
+        b.show();
+
 
     }
 
@@ -152,11 +210,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         float y = values[1];
         float z = values[2];
 
-        Log.i("x", Float.toString(x));
-        Log.i("y", Float.toString(y));
+
         Log.i("z", Float.toString(z));
 
-        steering = z;
+
+        steering = z*10 ;
 
     }
 
@@ -168,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onResume() {
         super.onResume();
-        sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_GAME);
 
         View decorView = getWindow().getDecorView();
         // Hide both the navigation bar and the status bar.
@@ -239,6 +297,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 s = new Socket(server, port);
                 is = s.getInputStream();
                 dis = new DataInputStream(is);
+                os = s.getOutputStream();
+                dos = new DataOutputStream(os);
+
+
+
 
                 while (s.isConnected()){
                     speed = dis.readDouble();
@@ -246,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     dos.writeDouble(inputGas);
                     dos.writeDouble(inputBrake);
                     dos.writeDouble(steering);
+
 
 
 
@@ -268,8 +332,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return null;
         }
     }
-
-
 
 
 
