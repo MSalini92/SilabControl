@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+        rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
 
 
@@ -211,10 +211,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         float z = values[2];
 
 
-        Log.i("z", Float.toString(z));
+
+        Log.i("y", Float.toString(y));
+
+        if(y < 3 && y > -3){
+            steering = y * -0.1;
+        }
+        if(y > 3 && y < 5){
+            steering = y * -0.2;
+        }
+        if(y < -3 && y > -5){
+            steering = y * -0.2;
+        }
+        if(y > 5 && y < 6){
+            steering = y * -0.3;
+        }
+        if(y < -5 && y > -6){
+            steering = y * -0.3;
+        }
+        if(y > 6 && y < 9){
+            steering = y * -0.5;
+        }
+        if(y < -6 && y > -9){
+            steering = y * -0.5;
+        }
 
 
-        steering = z*10 ;
 
     }
 
