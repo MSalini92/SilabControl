@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     double inputGas = 0;
     double inputBrake = 0;
     double steering = 0;
+    double speed;
+    double rpm;
 
     ImageView pointerSpeed;
     ImageView pointerRevs;
@@ -102,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    inputGas = 0.7;
+                    inputGas = 1.0;
                     v.setPressed(true);
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     inputGas = 0.0;
@@ -118,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    inputBrake = 2.0;
+                    inputBrake = 3.0;
                     v.setPressed(true);
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     inputBrake = 0.0;
@@ -213,29 +215,67 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
         Log.i("y", Float.toString(y));
+        //Log.i("z", Float.toString(z));
 
-        if(y < 3 && y > -3){
-            steering = y * -0.1;
+
+   /*
+
+       if(y > - 3 && y < 3){
+           steering = y * -0.0001;
+       }
+        if(y < -3 && y > - 5) {
+            steering = y * -0.005;
         }
         if(y > 3 && y < 5){
-            steering = y * -0.2;
+            steering = y * -0.005;
         }
-        if(y < -3 && y > -5){
-            steering = y * -0.2;
+       if(y < -5 && y > - 6) {
+           steering = y * -0.2;
+       }
+       if(y > 5 && y < 6){
+           steering = y * -0.2;
+       }
+       else {
+           steering = y * - 0.5;
+       }
+
+
+
+    */
+
+
+            steering = y * -0.1;
+
+
+
+ /*
+
+       if(z > 3 && z < 5){
+           inputGas = z * 0.04;
+           inputBrake = 0;
+       }
+        if(z > 5 && z < 10){
+            inputGas = z * 0.08;
+            inputBrake = 0;
         }
-        if(y > 5 && y < 6){
-            steering = y * -0.3;
-        }
-        if(y < -5 && y > -6){
-            steering = y * -0.3;
-        }
-        if(y > 6 && y < 9){
-            steering = y * -0.5;
-        }
-        if(y < -6 && y > -9){
-            steering = y * -0.5;
+       if( z < 3 && z > 1.5 && y > -5 && y < 5 ){
+           inputGas = 0;
+           inputBrake = 0.2;
+       }
+        if( z < 1.5 && z > 0 && y > -5 && y < 5 ){
+            inputGas = 0;
+            inputBrake = 0.4;
         }
 
+       if(z < 0 && z > -3){
+           inputBrake = 3 - (-z);
+           inputGas = 0;
+       }
+       if(z < -3){
+           inputBrake = 5;
+           inputGas = 0;
+       }
+*/
 
 
     }
@@ -282,8 +322,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
    public class Client extends AsyncTask<Void, Float, Float> {
 
 
-        double speed;
-        double rpm;
+
         float angle;
         float angle2;
 
