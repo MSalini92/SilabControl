@@ -21,6 +21,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -40,15 +41,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     double steering = 0;
     double speed;
     double rpm;
+    double steeringSensitivity = 0.3;
 
     ImageView pointerSpeed;
     ImageView pointerRevs;
+
+    SeekBar seekBar;
 
     Socket s;
     DataInputStream dis;
     InputStream is;
     DataOutputStream dos;
     OutputStream os;
+
 
     String server = "192.168.2.105";
     int port = 25143;
@@ -83,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         pointerRevs = (ImageView) findViewById(R.id.imageView3);
         buttonThrottle = (Button) findViewById(R.id.button2);
         buttonBrake = (Button) findViewById(R.id.button);
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
 
 
 
@@ -104,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    inputGas = 1.0;
+                    inputGas = 0.7;
                     v.setPressed(true);
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     inputGas = 0.0;
@@ -135,8 +141,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
 
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                steeringSensitivity = (progress * 0.1) + 0.1;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+
 
     }
+
+
+
 
 
 
@@ -244,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     */
 
 
-            steering = y * -0.1;
+            steering = y * (steeringSensitivity * -1);
 
 
 
